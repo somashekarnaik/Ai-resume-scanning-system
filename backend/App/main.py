@@ -69,6 +69,7 @@ app.include_router(
 )
 
 
+@app.get("/")
 @app.get("/api")
 def home():
     return {
@@ -76,10 +77,9 @@ def home():
     }
 
 
-
 @app.get("/health")
 @app.get("/api/health")
 def health():
     return {
         "status": "OK"
-    }
+    }
