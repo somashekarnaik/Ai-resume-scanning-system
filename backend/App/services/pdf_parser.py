@@ -1,4 +1,7 @@
-import fitz # pyright: ignore[reportMissingImports]
+try:
+    import pymupdf as fitz  # pyright: ignore[reportMissingImports]
+except ImportError:
+    import fitz  # pyright: ignore[reportMissingImports]
 
 def extract_pdf_text(
     file_path

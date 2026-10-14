@@ -24,11 +24,32 @@ from ..schemas import SampleResumeRequest
 
 router = APIRouter(prefix="/api/resume", tags=["Resume"])
 
-UPLOAD_FOLDER = Path("uploads")
-UPLOAD_FOLDER.mkdir(exist_ok=True)
+import os
+
+def _resolve_upload_folder() -> Path:
+    env_dir = os.getenv("UPLOAD_DIR")
+    if env_dir:
+        folder = Path(env_dir)
+    elif os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+        folder = Path("/tmp/uploads")
+    else:
+        folder = Path("uploads")
+    try:
+        folder.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        folder = Path("/tmp/uploads")
+        folder.mkdir(parents=True, exist_ok=True)
+    return folder
 
 
-def _save_uploaded_file(file: UploadFile, subfolder: Path = UPLOAD_FOLDER):
+UPLOAD_FOLDER = _resolve_upload_folder()
+
+
+def _save_uploaded_file(file: UploadFile, subfolder: Path | None = None):
+    if subfolder is None:
+        subfolder = _resolve_upload_folder()
+    subfolder.mkdir(parents=True, exist_ok=True)
+
     filename = file.filename or "upload"
     extension = Path(filename).suffix.lower()
     unique_name = f"{uuid.uuid4().hex}{extension}"

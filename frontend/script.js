@@ -104,11 +104,12 @@ async function loginUser(event) {
             name: data.name,
             email,
         }));
+        localStorage.setItem("user_name", data.name);
 
         showMessage("loginMessage", "Login successful! Redirecting...");
 
         setTimeout(() => {
-            window.location.href = "upload%20resume.html";
+            window.location.href = "upload-resume.html";
         }, 800);
     } catch (error) {
         console.error(error);
@@ -252,6 +253,99 @@ function downloadTailoredResume(button) {
     link.click();
     URL.revokeObjectURL(url);
 }
+
+function logoutUser() {
+    localStorage.removeItem("user");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("user_name");
+    localStorage.removeItem("resume_result");
+    sessionStorage.removeItem("resumeAnalysisResult");
+    window.location.href = "login.html";
+}
+
+async function findJobs(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const input = document.getElementById("userSkills");
+    const container = document.getElementById("jobs");
+    if (!input || !container) return;
+
+    const skills = input.value.trim();
+    if (!skills) {
+        alert("Please enter at least one skill (e.g. Python, SQL, React).");
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="job-card" style="text-align: center; color: #5b6475;">
+            <p>Scanning job roles for matching skills...</p>
+        </div>
+    `;
+
+    try {
+        const response = await fetch(apiUrl("/api/jobs/match"), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ skills }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || "Failed to find matching jobs.");
+        }
+
+        const jobs = await response.json();
+        container.replaceChildren();
+
+        if (!jobs || !jobs.length) {
+            container.innerHTML = `
+                <div class="job-card">
+                    <p>No matching jobs found for those skills. Try adding skills like Python, SQL, React, Machine Learning, or Excel.</p>
+                </div>
+            `;
+            return;
+        }
+
+        jobs.forEach((job) => {
+            const card = document.createElement("article");
+            card.className = "job-card";
+            card.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <h3 style="font-size: 20px; color: #182848; margin-bottom: 4px;">${job.title}</h3>
+                        <p class="job-match-company" style="font-weight: 500;">${job.company || "Company Partner"}</p>
+                    </div>
+                    <span class="job-match-score" style="font-size: 16px; background: #e7f0ff; padding: 6px 14px; border-radius: 20px;">
+                        ${job.match_score}% match
+                    </span>
+                </div>
+                <div style="margin-top: 14px;">
+                    <p style="font-size: 14px; color: #334155; margin-bottom: 8px;"><strong>Matched Skills:</strong></p>
+                    <div>
+                        ${job.matched_skills && job.matched_skills.length
+                            ? job.matched_skills.map(s => `<span class="skill" style="font-size: 13px;">${s}</span>`).join(" ")
+                            : "<span style='color: #64748b; font-size: 14px;'>No direct overlap with listed role requirements</span>"}
+                    </div>
+                </div>
+            `;
+            container.append(card);
+        });
+    } catch (error) {
+        console.error("Job matching error:", error);
+        container.innerHTML = `
+            <div class="job-card" style="border-left: 4px solid #c62828;">
+                <p style="color: #c62828; font-weight: bold;">Could not complete job search</p>
+                <p style="color: #64748b; font-size: 14px; margin-top: 4px;">${error.message || "Please check connection to the backend."}</p>
+            </div>
+        `;
+    }
+}
+
+window.findJobs = findJobs;
+window.logoutUser = logoutUser;
+window.logout = logoutUser;
+
 
 async function loadJobRoles(roleSelect, jobDescription) {
     try {
@@ -432,10 +526,11 @@ async function uploadResume() {
 
         try {
             sessionStorage.setItem("resumeAnalysisResult", JSON.stringify(data));
+            localStorage.setItem("resume_result", JSON.stringify(data));
         } catch (storageError) {
             throw new Error("The analysis is ready, but could not be saved for the results page. Please try again.");
         }
-        window.location.href = "resume%20result.html";
+        window.location.href = "resume-result.html";
     } catch (error) {
         console.error(error);
         showUploadMessage(error.message || "Could not connect to the backend.", true);
@@ -451,7 +546,7 @@ async function uploadResume() {
 document.addEventListener("DOMContentLoaded", () => {
     if (document.body.dataset.entryGate === "true") {
         window.location.replace(
-            getAuthenticatedUser() ? "upload%20resume.html" : "register.html"
+            getAuthenticatedUser() ? "upload-resume.html" : "register.html"
         );
         return;
     }
@@ -465,6 +560,57 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     checkBackend();
+
+    // Sync dashboard profile and stats if available
+    const authUser = getAuthenticatedUser();
+    const userNameEl = document.getElementById("userName");
+    if (userNameEl && authUser) {
+        userNameEl.textContent = authUser.name || "User";
+    }
+
+    const savedResumeResult = localStorage.getItem("resume_result");
+    if (savedResumeResult) {
+        try {
+            const parsed = JSON.parse(savedResumeResult);
+            const resumeScoreEl = document.getElementById("resumeScore");
+            const skillsCountEl = document.getElementById("skillsCount");
+            const jobsCountEl = document.getElementById("jobsCount");
+            if (resumeScoreEl && parsed.overall_score !== undefined) {
+                resumeScoreEl.textContent = `${Number(parsed.overall_score).toFixed(1)}%`;
+            }
+            if (skillsCountEl && parsed.resume_skills) {
+                skillsCountEl.textContent = parsed.resume_skills.length;
+            }
+            if (jobsCountEl && parsed.matched_skills) {
+                jobsCountEl.textContent = parsed.matched_skills.length;
+            }
+        } catch (e) {
+            console.error("Could not parse saved resume result:", e);
+        }
+    }
+
+    // Attach logout handlers
+    document.querySelectorAll(".logout-btn, #logoutButton, a[href*='logout']").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            logoutUser();
+        });
+    });
+
+    // Attach findJobs handlers
+    const findJobsBtn = document.getElementById("findJobsButton") || document.querySelector("button[onclick*='findJobs']");
+    if (findJobsBtn) {
+        findJobsBtn.addEventListener("click", findJobs);
+    }
+    const userSkillsInput = document.getElementById("userSkills");
+    if (userSkillsInput) {
+        userSkillsInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                findJobs();
+            }
+        });
+    }
 
     const registerForm = document.getElementById("registerForm");
     const loginForm = document.getElementById("loginForm");
@@ -481,7 +627,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const resultStatus = document.getElementById("resumeResultStatus");
 
     if (resultPage && resultStatus) {
-        const savedResult = sessionStorage.getItem("resumeAnalysisResult");
+        const savedResult = sessionStorage.getItem("resumeAnalysisResult") || localStorage.getItem("resume_result");
         if (savedResult) {
             try {
                 displayJobMatches(JSON.parse(savedResult));
@@ -537,5 +683,4 @@ document.addEventListener("DOMContentLoaded", () => {
             downloadTailoredResume(downloadSampleButton)
         );
     }
-
 });

@@ -1,67 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Job Matching</title>
-
-    <link rel="stylesheet"
-          href="style.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Matching - AI Resume Scanner</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
-<body>
+<body data-auth-required="true">
 
 <nav class="navbar">
-
     <a class="logo" href="index.html">
-        <img src="assets/resume-spark.svg" alt="">
+        <img src="assets/resume-spark.svg" alt="AI Resume Scanner Logo">
         <span>AI Resume Scanner</span>
     </a>
-
-    <a href="dashboard.html">
-        Dashboard
-    </a>
-
+    <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="upload-resume.html">Resume Scanner</a>
+        <a href="job-matching.html" class="active">Job Matching</a>
+        <button type="button" class="logout-btn secondary-btn" id="logoutButton">Logout</button>
+    </div>
 </nav>
 
-
-<div class="container">
-
-    <h1>Job Matching</h1>
+<main class="container">
+    <h1>Target Job Matching</h1>
+    <p class="subtitle" style="color: #5b6475; margin-bottom: 24px;">
+        Enter your key technical skills and let our AI match you against market-calibrated job roles.
+    </p>
 
     <div class="form-card">
-
-        <label>
-            Enter Your Skills
-        </label>
-
+        <label for="userSkills">Enter Your Skills</label>
         <input
             type="text"
             id="userSkills"
             placeholder="Python, SQL, Machine Learning..."
         >
-
-
-        <button onclick="findJobs()">
+        <button id="findJobsButton" type="button" onclick="findJobs()">
             Find Matching Jobs
         </button>
-
     </div>
 
+    <section id="jobs" style="margin-top: 30px;"></section>
+</main>
 
-    <div id="jobs"></div>
-
-</div>
-
+<footer>
+    <p>AI Resume Scanning System &copy; 2026</p>
+    <p>BTech AI/ML Project</p>
+</footer>
 
 <script type="module" src="script.js"></script>
-
 </body>
-
 </html>

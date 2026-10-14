@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analysis Results - AI Resume Scanner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body data-auth-required="true">
+    <nav class="navbar">
+        <a class="logo" href="index.html">
+            <img src="assets/resume-spark.svg" alt="AI Resume Scanner Logo">
+            <span>AI Resume Scanner</span>
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="upload-resume.html">Resume Scanner</a>
+            <a href="job-matching.html">Job Matching</a>
+            <button type="button" class="logout-btn secondary-btn" id="logoutButton">Logout</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>Resume Analysis Results</h1>
+        <section id="resumeResultStatus" class="result-card" role="status">
+            Loading your resume analysis...
+            <p style="margin-top: 10px;"><a href="upload-resume.html" class="btn" style="color: white; text-decoration: none;">Go to Resume Upload</a></p>
+        </section>
+
+        <div id="resumeResultContent" hidden>
+            <section class="score-grid" aria-label="Resume scores">
+                <article class="score-card">
+                    <h2>Overall Score</h2>
+                    <span id="overallScore">0%</span>
+                </article>
+                <article class="score-card">
+                    <h2>Expected Role Skill Match</h2>
+                    <span id="skillScore">0%</span>
+                </article>
+                <article class="score-card">
+                    <h2>Job Description Similarity</h2>
+                    <span id="similarityScore">0%</span>
+                </article>
+            </section>
+
+            <section class="result-card">
+                <h2>Detected Skills</h2>
+                <div id="detectedSkills"></div>
+            </section>
+
+            <section class="result-card">
+                <h2>Matched Skills</h2>
+                <div id="matchedSkills"></div>
+            </section>
+
+            <section class="result-card">
+                <h2>Skills to Develop</h2>
+                <div id="missingSkills"></div>
+            </section>
+
+            <section class="result-card">
+                <h2>Recommendations</h2>
+                <ul id="recommendations"></ul>
+            </section>
+
+            <section id="jobMatches" class="job-matches result-card" aria-live="polite" hidden>
+                <h2>Expected Role Match &amp; Job Recommendations</h2>
+                <p id="jobMatchesSummary"></p>
+                <p id="recommendationReason" class="recommendation-reason"></p>
+                <div id="jobMatchesList"></div>
+
+                <section id="sampleResumeSection" class="sample-resume" hidden>
+                    <h2>Tailored Resume for <span id="sampleResumeRole"></span></h2>
+                    <p class="sample-resume-note">
+                        This DOCX uses text extracted from your uploaded resume. Review it and correct any extraction mistakes before applying.
+                    </p>
+                    <pre id="sampleResumeText"></pre>
+                    <button type="button" id="downloadSampleResume" class="secondary-btn" style="margin-top: 12px;">
+                        Download Tailored Resume (.docx)
+                    </button>
+                </section>
+
+                <section id="formatReview" class="format-review" hidden>
+                    <h2>Resume Format Review</h2>
+                    <ul id="formatIssues"></ul>
+                    <p id="formatReviewNote" class="sample-resume-note"></p>
+                </section>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>AI Resume Scanning System &copy; 2026</p>
+        <p>BTech AI/ML Project</p>
+    </footer>
+
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>

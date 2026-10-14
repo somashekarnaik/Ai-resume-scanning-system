@@ -1,19 +1,46 @@
+import os
+import shutil
 import sqlite3
+from pathlib import Path
 
 
-DATABASE_NAME = "resume_scanner.db"
+def _resolve_db_path() -> str:
+    env_path = os.getenv("DATABASE_PATH")
+    if env_path:
+        db_path = Path(env_path)
+        try:
+            db_path.parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            pass
+        return str(db_path)
+
+    if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+        tmp_db = Path("/tmp/resume_scanner.db")
+        try:
+            tmp_db.parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            pass
+        if not tmp_db.exists():
+            for candidate in [
+                Path(__file__).resolve().parents[2] / "resume_scanner.db",
+                Path(__file__).resolve().parents[1] / "resume_scanner.db",
+                Path("resume_scanner.db"),
+            ]:
+                if candidate.exists():
+                    try:
+                        shutil.copy(candidate, tmp_db)
+                        break
+                    except Exception:
+                        pass
+        return str(tmp_db)
+
+    return "resume_scanner.db"
+
 
 
 def get_connection():
-
-    connection = sqlite3.connect(
-        DATABASE_NAME
-    )
-
-    connection.row_factory = (
-        sqlite3.Row
-    )
-
+    connection = sqlite3.connect(_resolve_db_path())
+    connection.row_factory = sqlite3.Row
     return connection
 
 

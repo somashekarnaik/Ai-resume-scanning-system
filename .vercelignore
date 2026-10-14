@@ -1,0 +1,15 @@
+.git
+.github
+.vscode
+.pytest_cache
+venv
+.venv
+backend/venv
+frontend/node_modules
+node_modules
+uploads
+*.db
+*.pyc
+__pycache__
+backend/**/__pycache__
+.env.local

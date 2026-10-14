@@ -2,98 +2,91 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Dashboard</title>
-
-    <link rel="stylesheet"
-          href="style.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Resume Scanner</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body data-auth-required="true">
 
 <nav class="navbar">
-
     <a class="logo" href="index.html">
-        <img src="assets/resume-spark.svg" alt="">
+        <img src="assets/resume-spark.svg" alt="AI Resume Scanner Logo">
         <span>AI Resume Scanner</span>
     </a>
 
-    <div>
-
-        <a href="dashboard.html">
-            Dashboard
-        </a>
-
-        <a href="upload-resume.html">
-            Upload Resume
-        </a>
-
-        <a href="job-matching.html">
-            Job Matching
-        </a>
-
-        <a href="index.html">
-            Logout
-        </a>
-
+    <div class="nav-links">
+        <a href="dashboard.html" class="active">Dashboard</a>
+        <a href="upload-resume.html">Resume Scanner</a>
+        <a href="job-matching.html">Job Matching</a>
+        <button type="button" class="logout-btn secondary-btn" id="logoutButton">Logout</button>
     </div>
-
 </nav>
 
-
 <div class="container">
-
-    <h1>Dashboard</h1>
-
-    <div class="dashboard-grid">
-
-        <div class="dashboard-card">
-
-            <h2>📄 Resume Scanner</h2>
-
-            <p>
-                Upload your resume and analyze it.
-            </p>
-
-            <a
-                href="upload-resume.html"
-                class="btn"
-            >
-                Upload Resume
-            </a>
-
-        </div>
-
-
-        <div class="dashboard-card">
-
-            <h2>🎯 Job Matching</h2>
-
-            <p>
-                Find jobs matching your skills.
-            </p>
-
-            <a
-                href="job-matching.html"
-                class="btn"
-            >
-                Find Jobs
-            </a>
-
-        </div>
-
+    <div style="margin-bottom: 30px;">
+        <h1 style="font-size: 32px; color: #182848;">
+            Welcome back, <span id="userName" style="color: #315efb;">User</span>! 👋
+        </h1>
+        <p style="color: #5b6475; font-size: 16px; margin-top: 6px;">
+            AI-powered resume scanning, skill extraction, and career role matching.
+        </p>
     </div>
 
+    <!-- Live Statistics from local analysis -->
+    <div class="score-grid" style="margin-bottom: 35px;">
+        <article class="score-card">
+            <h2>Last Resume Score</h2>
+            <span id="resumeScore">--</span>
+        </article>
+        <article class="score-card">
+            <h2>Skills Extracted</h2>
+            <span id="skillsCount">--</span>
+        </article>
+        <article class="score-card">
+            <h2>Role Matches</h2>
+            <span id="jobsCount">--</span>
+        </article>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="dashboard-card">
+            <h2>📄 Resume Scanner &amp; AI Analysis</h2>
+            <p style="color: #5b6475; margin: 12px 0 20px;">
+                Upload your PDF or DOCX resume, match against job requirements, and get a tailored DOCX resume.
+            </p>
+            <a href="upload-resume.html" class="btn">
+                Scan Resume
+            </a>
+        </div>
+
+        <div class="dashboard-card">
+            <h2>🎯 Job Matching Engine</h2>
+            <p style="color: #5b6475; margin: 12px 0 20px;">
+                Enter your technical skills to identify high-probability job roles and see skill gaps.
+            </p>
+            <a href="job-matching.html" class="btn">
+                Explore Matching Roles
+            </a>
+        </div>
+    </div>
+
+    <div class="result-card" style="margin-top: 30px;">
+        <h2 style="font-size: 20px; margin-bottom: 15px;">Quick Actions</h2>
+        <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+            <a href="upload-resume.html" class="secondary-btn" style="text-decoration: none;">📤 Upload New Resume</a>
+            <a href="resume-result.html" class="secondary-btn" style="text-decoration: none;">📊 View Resume Results</a>
+            <a href="job-matching.html" class="secondary-btn" style="text-decoration: none;">🔎 Search Matching Jobs</a>
+        </div>
+    </div>
 </div>
 
+<footer>
+    <p>AI Resume Scanning System &copy; 2026</p>
+    <p>BTech AI/ML Project</p>
+</footer>
+
 <script type="module" src="script.js"></script>
-
 </body>
-
 </html>

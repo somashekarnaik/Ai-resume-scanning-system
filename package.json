@@ -1,0 +1,11 @@
+{
+  "name": "ai-resume-scanning-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI powered resume analysis and job matching system",
+  "scripts": {
+    "build": "npm --prefix frontend install && npm --prefix frontend run build",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "python -m uvicorn App.main:app --app-dir backend --reload --port 8000"
+  }
+}

@@ -29,30 +29,27 @@ app = FastAPI(
 
 )
 
-cors_origins = [
-    origin.strip()
-    for origin in os.getenv(
-        "BACKEND_CORS_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173",
-    ).split(",")
-    if origin.strip()
-]
+cors_origins_env = os.getenv("BACKEND_CORS_ORIGINS", "*").strip()
+if cors_origins_env == "*" or not cors_origins_env:
+    cors_origins = ["*"]
+else:
+    cors_origins = [origin.strip() for origin in cors_origins_env.split(",") if origin.strip()]
 
 app.add_middleware(
-
     CORSMiddleware,
-
     allow_origins=cors_origins,
-    allow_credentials=False,
-
+    allow_origin_regex=r"https://.*\.vercel\.app" if cors_origins != ["*"] else None,
+    allow_credentials=True if cors_origins != ["*"] else False,
     allow_methods=["*"],
-
-    allow_headers=["*"]
-
+    allow_headers=["*"],
 )
 
 
-create_tables()
+try:
+    create_tables()
+except Exception as error:
+    print(f"Warning: Database initialization returned: {error}")
+
 
 
 app.include_router(
@@ -72,23 +69,17 @@ app.include_router(
 )
 
 
-@app.get("/")
+@app.get("/api")
 def home():
-
     return {
-
-        "message":
-            "AI Resume Scanning System Backend is Running"
-
+        "message": "AI Resume Scanning System Backend is Running"
     }
+
 
 
 @app.get("/health")
+@app.get("/api/health")
 def health():
-
     return {
-
-        "status":
-            "OK"
-
-    }
+        "status": "OK"
+    }

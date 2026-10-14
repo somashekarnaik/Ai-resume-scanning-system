@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Resume - AI Resume Scanner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body data-auth-required="true">
+
+<nav class="navbar">
+    <a class="logo" href="index.html">
+        <img src="assets/resume-spark.svg" alt="AI Resume Scanner Logo">
+        <span>AI Resume Scanner</span>
+    </a>
+
+    <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="upload-resume.html" class="active">Resume Scanner</a>
+        <a href="job-matching.html">Job Matching</a>
+        <button type="button" class="logout-btn secondary-btn" id="logoutButton">Logout</button>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="upload-card">
+        <h1>Upload Resume</h1>
+        <p style="color: #5b6475; margin-bottom: 20px;">
+            Supported formats: PDF and DOCX
+        </p>
+
+        <div class="file-upload-group">
+            <label for="resumeFile">Resume File (.pdf, .docx)</label>
+            <input
+                type="file"
+                id="resumeFile"
+                accept=".pdf,.docx"
+            >
+        </div>
+
+        <div class="photo-upload-group">
+            <label>Profile photo / document photo (optional)</label>
+            <div class="photo-actions">
+                <button type="button" id="cameraButton" class="secondary-btn">
+                    Use Camera
+                </button>
+                <button type="button" id="uploadPhotoButton" class="secondary-btn">
+                    Upload Photo
+                </button>
+            </div>
+
+            <input
+                type="file"
+                id="photoUpload"
+                accept="image/*"
+                capture="environment"
+                hidden
+            >
+
+            <video id="cameraPreview" autoplay playsinline muted hidden></video>
+            <canvas id="photoCanvas" hidden></canvas>
+
+            <div id="photoPreviewWrapper" class="photo-preview-wrapper" hidden>
+                <img id="photoPreview" alt="Captured or uploaded photo preview">
+            </div>
+
+            <button type="button" id="capturePhotoButton" class="secondary-btn hidden">
+                Capture Photo
+            </button>
+        </div>
+
+        <label for="expectedJobRole">Expected Job Role</label>
+        <select id="expectedJobRole">
+            <option value="Python Developer" selected>Python Developer</option>
+            <option value="AI/ML Engineer">AI/ML Engineer</option>
+            <option value="Frontend Developer">Frontend Developer</option>
+            <option value="Data Analyst">Data Analyst</option>
+            <option value="Software Developer">Software Developer</option>
+            <option value="Backend Developer">Backend Developer</option>
+            <option value="Full Stack Developer">Full Stack Developer</option>
+            <option value="Financial Analyst">Financial Analyst</option>
+        </select>
+
+        <label for="jobDescription">Target Job Description (editable)</label>
+        <textarea
+            id="jobDescription"
+            aria-describedby="jobDescriptionHelp"
+        >Loading sample job description...</textarea>
+        <p id="jobDescriptionHelp" class="form-help">
+            Choose a role to load its sample description, or paste any custom job description.
+        </p>
+
+        <button id="analyzeResumeButton" type="button">
+            Analyze Resume
+        </button>
+
+        <p id="uploadMessage" style="margin-top: 14px;"></p>
+    </div>
+</div>
+
+<footer>
+    <p>AI Resume Scanning System &copy; 2026</p>
+    <p>BTech AI/ML Project</p>
+</footer>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>

@@ -1,3 +1,39 @@
-**/.env
-**/.env.*
-!**/.env.example
+# Environment variables - never commit secrets
+.env
+.env.*
+!.env.example
+.env.local
+
+# Vercel local config
+.vercel
+
+# Python virtual environments
+.venv/
+venv/
+backend/venv/
+
+# Python compiled files
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Database files (ephemeral / local only)
+*.db
+*.sqlite3
+
+# Upload directory (runtime, not source)
+uploads/
+
+# Node / frontend
+node_modules/
+frontend/node_modules/
+
+# Vite build output - Vercel builds this on deployment
+frontend/dist/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/settings.json
