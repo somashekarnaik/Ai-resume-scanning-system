@@ -86,40 +86,6 @@
         </div>
     </main>
 
-    <div class="career-assistant">
-        <button
-            id="assistantToggle"
-            class="assistant-toggle"
-            type="button"
-            aria-expanded="false"
-            aria-controls="assistantPanel"
-        >
-            <span aria-hidden="true">✦</span> Career AI Assistant
-        </button>
-        <section id="assistantPanel" class="assistant-panel" aria-label="Career AI Assistant" hidden>
-            <header class="assistant-header">
-                <div>
-                    <strong>Career AI Assistant</strong>
-                    <p>Career, job-search, interview, and resume help</p>
-                </div>
-                <button id="assistantClose" class="assistant-close" type="button" aria-label="Close assistant">×</button>
-            </header>
-            <div id="assistantMessages" class="assistant-messages" aria-live="polite">
-                <p class="assistant-message assistant-reply">
-                    Ask me anything about careers, jobs, interviews, or your resume analysis.
-                </p>
-            </div>
-            <form id="assistantForm" class="assistant-form">
-                <label class="sr-only" for="assistantQuestion">Ask a career question</label>
-                <textarea id="assistantQuestion" rows="2" maxlength="1000" placeholder="Ask a career question..." required></textarea>
-                <button id="assistantSend" type="submit">Ask</button>
-            </form>
-            <p class="assistant-disclaimer">
-                Your question, recent chat, and detected resume analysis (if available) are sent to OpenAI. The original resume file is not sent. Don't share sensitive information.
-            </p>
-        </section>
-    </div>
-
     <script type="module" src="script.js"></script>
 </body>
 

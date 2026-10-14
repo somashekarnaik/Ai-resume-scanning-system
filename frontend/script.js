@@ -1,27 +1,17 @@
-const API_URL = (
-    import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV ? "http://127.0.0.1:8000" : "")
-).replace(/\/+$/, "");
+const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 let cameraStream = null;
 let capturedPhotoFile = null;
 
 function apiUrl(path) {
-    if (!API_URL) {
-        throw new Error(
-            "The backend API is not configured for this deployed site. Set VITE_API_URL to your hosted backend URL."
-        );
-    }
-
     return `${API_URL}${path}`;
 }
 
 async function checkBackend() {
-    if (!API_URL) return;
-
     try {
-        const response = await fetch(apiUrl("/"));
-        const data = await response.json();
-        console.log(data.message);
+        const response = await fetch(apiUrl("/health"));
+        if (!response.ok) {
+            throw new Error(`Backend health check failed with status ${response.status}.`);
+        }
     } catch (error) {
         console.error("Backend is not running:", error);
     }
@@ -135,9 +125,6 @@ function showUploadMessage(message, isError = false) {
 }
 
 let currentTailoredResumeBase64 = "";
-let currentAssistantContext = null;
-let currentAssistantHistory = [];
-
 function populateResultList(containerId, items, itemClass = "") {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -179,21 +166,6 @@ function displayJobMatches(data) {
     ) return;
 
     const jobs = data.matching_jobs || [];
-    currentAssistantContext = {
-        resume_skills: data.resume_skills || [],
-        expected_role: data.expected_role,
-        expected_role_score: data.expected_role_score,
-        recommended_role: data.recommended_job.title,
-        format_issues: data.format_review?.issues || [],
-    };
-    currentAssistantHistory = [];
-    const assistantMessages = document.getElementById("assistantMessages");
-    if (assistantMessages) {
-        assistantMessages.replaceChildren();
-        appendAssistantMessage(
-            "Resume analysis updated. Ask me anything about careers, jobs, interviews, or this resume."
-        );
-    }
     list.replaceChildren();
     section.hidden = false;
     sampleSection.hidden = true;
@@ -263,65 +235,6 @@ function displayJobMatches(data) {
     populateResultList("matchedSkills", data.matched_skills || [], "skill");
     populateResultList("missingSkills", data.missing_skills || [], "skill missing");
     populateResultList("recommendations", data.recommendations || []);
-}
-
-function appendAssistantMessage(text, isUser = false) {
-    const messages = document.getElementById("assistantMessages");
-    if (!messages) return;
-
-    const message = document.createElement("p");
-    message.className = `assistant-message ${isUser ? "assistant-user" : "assistant-reply"}`;
-    message.textContent = text;
-    messages.append(message);
-    messages.scrollTop = messages.scrollHeight;
-}
-
-async function askCareerAssistant(event) {
-    event.preventDefault();
-
-    const questionInput = document.getElementById("assistantQuestion");
-    const sendButton = document.getElementById("assistantSend");
-    const question = questionInput?.value.trim();
-    if (!question || !questionInput || !sendButton) return;
-
-    appendAssistantMessage(question, true);
-    questionInput.value = "";
-
-    sendButton.disabled = true;
-    sendButton.textContent = "...";
-
-    try {
-        const response = await fetch(apiUrl("/api/assistant/chat"), {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                question,
-                history: currentAssistantHistory,
-                ...(currentAssistantContext || {}),
-            }),
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            const detail = Array.isArray(data.detail)
-                ? data.detail.map((item) => item.msg).join(", ")
-                : data.detail;
-            throw new Error(detail || "The assistant could not answer right now.");
-        }
-
-        appendAssistantMessage(data.answer);
-        currentAssistantHistory = [
-            ...currentAssistantHistory,
-            { role: "user", content: question },
-            { role: "assistant", content: data.answer },
-        ].slice(-10);
-    } catch (error) {
-        console.error("Career assistant request failed:", error);
-        appendAssistantMessage(error.message || "I could not connect to the career assistant. Please try again.");
-    } finally {
-        sendButton.disabled = false;
-        sendButton.textContent = "Ask";
-        questionInput.focus();
-    }
 }
 
 function downloadTailoredResume(button) {
@@ -474,6 +387,13 @@ function handlePhotoUpload(event) {
 async function uploadResume() {
     const fileInput = document.getElementById("resumeFile");
     const analyzeButton = document.getElementById("analyzeResumeButton");
+    const user = getAuthenticatedUser();
+
+    if (!user) {
+        showUploadMessage("Please log in before uploading a resume.", true);
+        window.location.href = "login.html";
+        return;
+    }
 
     if (!fileInput || !fileInput.files.length) {
         alert("Please select a resume first.");
@@ -488,7 +408,7 @@ async function uploadResume() {
     formData.append("file", file);
     formData.append("job_description", jobDescription ? jobDescription.value : "");
     formData.append("expected_role", expectedRole ? expectedRole.value : "Python Developer");
-    formData.append("user_id", "1");
+    formData.append("user_id", String(user.user_id));
 
     if (capturedPhotoFile) {
         formData.append("photo", capturedPhotoFile, capturedPhotoFile.name);
@@ -557,10 +477,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const downloadSampleButton = document.getElementById("downloadSampleResume");
     const expectedRoleSelect = document.getElementById("expectedJobRole");
     const jobDescription = document.getElementById("jobDescription");
-    const assistantToggle = document.getElementById("assistantToggle");
-    const assistantPanel = document.getElementById("assistantPanel");
-    const assistantClose = document.getElementById("assistantClose");
-    const assistantForm = document.getElementById("assistantForm");
     const resultPage = document.getElementById("resumeResultContent");
     const resultStatus = document.getElementById("resumeResultStatus");
 
@@ -622,25 +538,4 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-    if (assistantToggle && assistantPanel) {
-        assistantToggle.addEventListener("click", () => {
-            assistantPanel.hidden = !assistantPanel.hidden;
-            assistantToggle.setAttribute("aria-expanded", String(!assistantPanel.hidden));
-            if (!assistantPanel.hidden) {
-                document.getElementById("assistantQuestion")?.focus();
-            }
-        });
-    }
-
-    if (assistantClose && assistantPanel && assistantToggle) {
-        assistantClose.addEventListener("click", () => {
-            assistantPanel.hidden = true;
-            assistantToggle.setAttribute("aria-expanded", "false");
-            assistantToggle.focus();
-        });
-    }
-
-    if (assistantForm) {
-        assistantForm.addEventListener("submit", askCareerAssistant);
-    }
 });

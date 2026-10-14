@@ -55,6 +55,39 @@ class CareerAssistantTests(unittest.IsolatedAsyncioTestCase):
             ["user", "assistant"],
         )
 
+    async def test_redirects_questions_unrelated_to_careers(self):
+        question = "Why does the Moon appear to change shape?"
+        data = CareerAssistantRequest(question=question)
+        response = SimpleNamespace(
+            choices=[
+                SimpleNamespace(
+                    message=SimpleNamespace(
+                        content="I can help with career-related questions. What would "
+                        "you like to know about your career or job search?"
+                    )
+                )
+            ]
+        )
+
+        with (
+            patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}),
+            patch("App.services.career_assistant.AsyncOpenAI") as openai_client,
+        ):
+            openai_client.return_value.chat.completions.create = AsyncMock(
+                return_value=response
+            )
+            answer = await answer_career_question(data)
+
+        self.assertIn("career-related questions", answer)
+        request_messages = (
+            openai_client.return_value.chat.completions.create.await_args.kwargs[
+                "messages"
+            ]
+        )
+        self.assertIn("answer unrelated questions", request_messages[0]["content"])
+        self.assertIn("career-related question", request_messages[0]["content"])
+        self.assertEqual(request_messages[-1]["content"], question)
+
     async def test_reports_missing_api_key(self):
         data = CareerAssistantRequest(question="How do I prepare for an interview?")
 
