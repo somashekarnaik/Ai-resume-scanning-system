@@ -5,8 +5,11 @@
   "outputDirectory": "frontend/dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/index.py" },
-    { "source": "/health",     "destination": "/api/index.py" }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.py" },
+    { "src": "/health",   "dest": "/api/index.py" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)",     "dest": "/$1.html",    "status": 200 },
+    { "src": "/",         "dest": "/index.html",  "status": 200 }
   ]
 }
