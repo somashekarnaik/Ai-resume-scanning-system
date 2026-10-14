@@ -5,7 +5,7 @@ const htmlPage = (name) =>
     fileURLToPath(new URL(`./${name}`, import.meta.url));
 
 export default defineConfig({
-    base: "./",
+    base: "/",
     server: {
         proxy: {
             "/api": {

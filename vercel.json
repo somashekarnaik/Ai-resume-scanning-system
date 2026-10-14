@@ -3,14 +3,10 @@
   "version": 2,
   "buildCommand": "npm --prefix frontend install && npm --prefix frontend run build",
   "outputDirectory": "frontend/dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index.py?__orig_path=/api/$1"
-    },
-    {
-      "source": "/health",
-      "destination": "/api/index.py?__orig_path=/health"
-    }
+    { "source": "/api/:path*", "destination": "/api/index.py" },
+    { "source": "/health",     "destination": "/api/index.py" }
   ]
 }
