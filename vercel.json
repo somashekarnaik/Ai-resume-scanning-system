@@ -1,15 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "buildCommand": "npm --prefix frontend install && npm --prefix frontend run build",
-  "outputDirectory": "frontend/dist",
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.py" },
-    { "src": "/health",   "dest": "/api/index.py" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)",     "dest": "/$1.html",    "status": 200 },
-    { "src": "/",         "dest": "/index.html",  "status": 200 }
-  ]
+  "buildCommand": "npm --prefix frontend ci && npm --prefix frontend run build",
+  "trailingSlash": false
 }

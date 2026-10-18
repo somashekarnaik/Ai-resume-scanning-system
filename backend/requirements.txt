@@ -5,6 +5,5 @@ SQLAlchemy
 Pydantic
 PyMuPDF
 python-docx
-scikit-learn
 python-dotenv
 openai>=1.0.0

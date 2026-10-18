@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from fastapi import FastAPI
 
@@ -69,7 +70,6 @@ app.include_router(
 )
 
 
-@app.get("/")
 @app.get("/api")
 def home():
     return {
@@ -83,3 +83,9 @@ def health():
     return {
         "status": "OK"
     }
+
+
+# Serve the Vite build from the FastAPI app after Vercel completes the frontend build.
+frontend_directory = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+if frontend_directory.is_dir():
+    app.frontend("/", directory=frontend_directory)

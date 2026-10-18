@@ -32,7 +32,8 @@ class EndpointTests(unittest.TestCase):
 
         res_home = self.client.get("/")
         self.assertEqual(res_home.status_code, 200)
-        self.assertIn("message", res_home.json())
+        self.assertIn("text/html", res_home.headers["content-type"])
+        self.assertIn("AI Resume Scanning System", res_home.text)
 
     def test_job_roles_and_matching(self):
         # Test GET /api/jobs/roles
